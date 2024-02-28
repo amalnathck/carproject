@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import CustomUser
+from .models import CustomUser,Car
 from django.http import HttpResponse
 from django.contrib.auth import authenticate,login,logout
 
@@ -8,66 +8,67 @@ def index(request):
     return render(request,"index.html",{})
 def Login(request):
     return render(request,'login page.html')
-def user_register(request):
-    return render(request,'user-register.html')
-def company_register(request):
-    return render(request,'company-register.html')
+
 
 def cars(request):
     return render(request,'car.html')
 
 def User_register(request):
     if request.method == 'POST':
-        first_name = request.POST['first_name']
         phone = request.POST['phone']
-        username = request.POST['username']
-        password = request.POST['password']
+        email = request.POST['email']
 
-        data = CustomUser.objects.create_user(first_name=first_name,
-                                             phone=phone,
+        username = request.POST['username']
+        password = request.POST['pass']
+
+        data = CustomUser.objects.create_user(
+                                             phone_number=phone,
                                              username=username,
                                              password=password,
+                                             email=email,
                                              user_type = "User"
                                             )
 
         data.save()
-        return HttpResponse("created")
+        return render(request,'login page.html')
     else:
         return render(request,'user-register.html')
 
 
 def Company_register(request):
     if request.method == 'POST':
-        company_name = request.POST['first_name']
         phone = request.POST['phone']
-        username = request.POST['username']
-        password = request.POST['password']
+        email = request.POST['email']
 
-        data = CustomUser.objects.create_user(company_name=company_name,
-                                              phone=phone,
-                                              username=username,
-                                              password=password,
-                                              user_type="Company"
-                                              )
+        username = request.POST['Companyname']
+        password = request.POST['pass']
+
+        data = CustomUser.objects.create_user(
+            phone_number=phone,
+            username=username,
+            password=password,
+            email=email,
+            user_type="company"
+        )
 
         data.save()
-        return HttpResponse("created")
+        return render(request,'login page.html')
     else:
         return render(request, 'company-register.html')
 
 def Login(request):
     if request.method == 'POST':
         username = request.POST['username']
-        password = request.POST['password']
+        password = request.POST['pass']
         data = authenticate(username=username, password=password)
         if data is not None:
             login(request,data)
-            if data.user_type == "user":
-                return redirect("user profile")
+            if data.user_type == "User":
+                return redirect("cars")
             elif data.user_type == "company":
-                return redirect("company profile")
-            else:
-                return HttpResponse("invalid credentials")
+                return redirect("cars1")
+        else:
+            return render(request,'login page.html', {'message':"invalid credentials"})
     else:
         return render(request,'login page.html')
 
@@ -80,9 +81,79 @@ def companyprofile(request):
     return render(request, 'profile.html', {'data':data})
 
 def cars(request):
-    return render(request, 'car.html', )
+    return render(request, 'user/car.html', )
 
-def logout(request):
-    if 'id' in request.session:
-        request.session.flush()
-        return redirect(login)
+def cars1(request):
+    company = CustomUser.objects.get(id=request.user.id)
+    car = Car.objects.filter(company_id=company)
+    return render(request,'company/car1.html',{'car':car,'Company':company})
+
+def pricing(request):
+    return render(request, 'pricing.html', )
+
+def sample(request):
+    return render(request, 'sample.html', )
+
+def carbook(request):
+    return render(request, 'carbook.html', )
+
+
+def edit_profile(request):
+    User = CustomUser.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        User.username = request.POST['username']
+        User.email = request.POST['email']
+        User.phone_number = request.POST['phone']
+        User.save()
+        return render(request, 'user/car.html', )
+    else:
+        context = {
+            'User':User,
+        }
+        return render(request,'edit profile.html',context)
+
+def edit_coprofile(request):
+    Company = CustomUser.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        Company.username = request.POST['username']
+        Company.email = request.POST['email']
+        Company.phone_number = request.POST['phone']
+        Company.save()
+        return render(request, 'user/car.html', )
+    else:
+        context = {
+            'Company':Company,
+        }
+        return render(request,'edit-coprofile.html',context)
+
+
+def Logout(request):
+    logout(request)
+    return redirect(Login)
+
+def add_car(request):
+    company = CustomUser.objects.get(id=request.user.id)
+    if request.method=='POST':
+        car_name=request.POST['carname']
+        price= request.POST['price']
+        img1=request.FILES['image']
+        model=request.POST['model']
+        data=Car.objects.create(company_id=company,
+                               car_name=car_name,
+                               price=price,
+                               image=img1,
+                               model=model
+                               )
+
+        data.save()
+        car=Car.objects.filter(company_id=company)
+        return render(request,'company/car1.html',{'car':car,'Company':company})
+    else:
+        car = Car.objects.filter(company_id=company)
+        return render(request, 'company/car add.html', {'car': car, 'Company': company})
+
+
+
+
+
+
