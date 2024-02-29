@@ -81,7 +81,8 @@ def companyprofile(request):
     return render(request, 'profile.html', {'data':data})
 
 def cars(request):
-    return render(request, 'user/car.html', )
+    car = Car.objects.all()
+    return render(request, 'user/car.html',{'car':car} )
 
 def cars1(request):
     company = CustomUser.objects.get(id=request.user.id)
@@ -105,7 +106,7 @@ def edit_profile(request):
         User.email = request.POST['email']
         User.phone_number = request.POST['phone']
         User.save()
-        return render(request, 'user/car.html', )
+        return redirect(cars)
     else:
         context = {
             'User':User,
@@ -147,12 +148,34 @@ def add_car(request):
 
         data.save()
         car=Car.objects.filter(company_id=company)
-        return render(request,'company/car1.html',{'car':car,'Company':company})
+        return redirect(cars1)
     else:
         car = Car.objects.filter(company_id=company)
         return render(request, 'company/car add.html', {'car': car, 'Company': company})
 
 
+
+def edit_car(request,id):
+    car = Car.objects.get(id=id)
+    if request.method == 'POST':
+        car.car_name = request.POST['carname']
+        car.price = request.POST['price']
+        car.model = request.POST['model']
+        if 'image' in request.FILES:
+            car.image = request.FILES['image']
+        car.save()
+        return redirect(cars1)
+    else:
+        context = {
+            'car':car,
+        }
+        return render(request,'company/editcar.html',context)
+
+
+def delete_car(request,id):
+    car=Car.objects.get(id=id)
+    car.delete()
+    return redirect(cars1)
 
 
 

@@ -18,5 +18,16 @@ class Car(models.Model):
     price=models.IntegerField()
     image=models.FileField()
     model=models.CharField(max_length=100)
-# class Booking(models.Model):
-#     date=models.IntegerField()
+class Booking(models.Model):
+    booking_status = (
+        ('booked','booked'),
+        ('pending','pending'),
+        ('reject','reject')
+    )
+    user_id = models.ForeignKey(CustomUser,on_delete=models.CASCADE)
+    car_id = models.ForeignKey(Car,on_delete=models.CASCADE)
+    booking_date = models.DateField()
+    status = models.CharField(choices=booking_status, default='pending', max_length=50)
+    review = models.CharField(max_length=200, null=True,blank=True)
+
+

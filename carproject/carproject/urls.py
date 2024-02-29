@@ -17,7 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,5 +35,9 @@ urlpatterns = [
     path('logout',views.Logout,name="logout"),
     path('add_car',views.add_car,name="add_car"),
     path('carbook', views.carbook, name="carbook"),
+    path('delete_car/<int:id>', views.delete_car, name="delete_car"),
+    path('edit_car/<int:id>',views.edit_car,name="edit_car")
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

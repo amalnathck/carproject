@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADD Car</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="date"]
+         {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top:15px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ADD CARS</h2>
+        <form action="{% url 'edit_car' id=car.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="fullname">car name:</label>
+            <input type="text" id="fullname" name="carname" value="{{ car.car_name }}" >
+
+            <label for="price">price:</label>
+            <input type="text" id="price" name="price" value="{{ car.price }}" >
+
+            <label for="model">model</label>
+            <input type="text" id="model" name="model" value="{{ car.model }}" >
+
+
+
+           <br> <input type="file"  name="image" value="{{ car.image }}" ><br>
+            <input type="submit" value="edit">
+        </form>
+    </div>
+</body>
+</html>
